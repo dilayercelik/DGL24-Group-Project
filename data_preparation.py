@@ -21,4 +21,6 @@ def load_data_tensor():
     hr_train = multi_anti_vectorize(hr_train_raw.values, vectorizer, hr_n)
     lr_train = multi_anti_vectorize(lr_train_raw.values, vectorizer, lr_n)
     lr_test = multi_anti_vectorize(lr_test_raw.values, vectorizer, lr_n)
+
+    # NOTE the order of return is low res train, low res test, high res train
     return Tensor(lr_train), Tensor(lr_test), Tensor(hr_train)

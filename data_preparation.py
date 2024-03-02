@@ -7,12 +7,12 @@ from MatrixVectorizer import MatrixVectorizer
 def multi_anti_vectorize(arr, vectorizer, matrix_size): 
     return np.array([vectorizer.anti_vectorize(v, matrix_size) for v in arr])
 
-
-def load_data_tensor():
+# added an input so that the function can be adjusted to everyone's path to the dataset
+def load_data_tensor(path_to_datasets):
     # import data from .csv file
-    hr_train_raw = pd.read_csv('dgl-icl/hr_train.csv')
-    lr_train_raw = pd.read_csv('dgl-icl/lr_train.csv')
-    lr_test_raw = pd.read_csv('dgl-icl/lr_test.csv')
+    hr_train_raw = pd.read_csv(path_to_datasets + '/hr_train.csv')
+    lr_train_raw = pd.read_csv(path_to_datasets + '/lr_train.csv')
+    lr_test_raw = pd.read_csv(path_to_datasets + '/lr_test.csv')
 
     # anti-vectorize 
     lr_n = 160
@@ -24,3 +24,11 @@ def load_data_tensor():
 
     # NOTE the order of return is low res train, low res test, high res train
     return Tensor(lr_train), Tensor(lr_test), Tensor(hr_train)
+
+
+def split_train_data(data, test_ratio=0.2):
+    n = data.size(0)
+    split_idx = int(n * (1-test_ratio))
+    train_data, val_data = data[:split_idx, :, :], data[split_idx:, : , :]
+    
+    return train_data, val_data

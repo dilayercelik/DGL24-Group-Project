@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from GSR_Net.preprocessing import *
 from GSR_Net.model import *
 
-#criterion = nn.MSELoss()
-criterion = nn.L1Loss()
+criterion = nn.MSELoss()
+criterion_test = nn.L1Loss()
 
 def train(model, optimizer, subjects_adj,subjects_labels, args):
   
@@ -55,6 +55,7 @@ def train(model, optimizer, subjects_adj,subjects_labels, args):
 def test(model, test_adj, test_labels,args):
 
   test_error = []
+  test_error_mae = []
   preds_list=[]
   g_t = []
   
@@ -90,14 +91,18 @@ def test(model, test_adj, test_labels,args):
       preds_list.append(preds.flatten().detach())
       
       error = criterion(preds, hr)
+      error_mae = criterion_test(preds, hr)
       g_t.append(hr.flatten())
       print(error.item())
       test_error.append(error.item())
+      test_error_mae.append(error_mae.item())
      
       i+=1
 
-  #print ("Test error MSE: ", np.mean(test_error))
-  print("Test error MAE: ", np.mean(test_error))
+  print ("Test error MSE: ", np.mean(test_error))
+  print("Test error MAE: ", np.mean(test_error_mae))
+  print()
+  
   
   #plot histograms
 #   preds_list = [val for sublist in preds_list for val in sublist]

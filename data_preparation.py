@@ -32,3 +32,11 @@ def split_train_data(data, test_ratio=0.2):
     train_data, val_data = data[:split_idx, :, :], data[split_idx:, : , :]
     
     return train_data, val_data
+
+
+
+def generate_submission_file(prediction_tensors, filepath): 
+    vectorizer = MatrixVectorizer()
+    all_vectorized_arr = np.concatenate([vectorizer.vectorize(matrix) for matrix in prediction_tensors])
+    df = pd.DataFrame({'ID': list(range(1, len(all_vectorized_arr)+1)), 'Predicted': all_vectorized_arr})
+    df.to_csv(filepath)

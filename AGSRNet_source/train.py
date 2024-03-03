@@ -7,6 +7,7 @@ from AGSRNet_source.model import *
 import torch.optim as optim
 
 criterion = nn.MSELoss()
+criterion_test = nn.L1Loss()
 
 
 def train(model, subjects_adj, subjects_labels, args):
@@ -27,7 +28,7 @@ def train(model, subjects_adj, subjects_labels, args):
                 optimizerG.zero_grad()
                 
                 hr = pad_HR_adj(hr, args.padding)
-                lr = torch.from_numpy(lr).type(torch.FloatTensor)
+                #lr = torch.from_numpy(lr).type(torch.FloatTensor)
                 padded_hr = torch.from_numpy(hr).type(torch.FloatTensor)
 
                 # NOTE: torch.symeig was deprecated in torch version 1.9
@@ -74,19 +75,26 @@ def test(model, test_adj, test_labels, args):
 
     g_t = []
     test_error = []
+    test_error_mae = []
     preds_list = []
 
     # i = 0
 
     for lr, hr in zip(test_adj, test_labels):
-        all_zeros_lr = not np.any(lr)
-        all_zeros_hr = not np.any(hr)
+
+        # all_zeros_lr = not np.any(lr)
+        # all_zeros_hr = not np.any(hr)
+        all_zeros_lr = torch.all(lr == 0)
+        all_zeros_hr = torch.all(hr == 0)
+
         if all_zeros_lr == False and all_zeros_hr == False:
-            lr = torch.from_numpy(lr).type(torch.FloatTensor)
-            np.fill_diagonal(hr, 1)
+            #lr = torch.from_numpy(lr).type(torch.FloatTensor)
+            #np.fill_diagonal(hr, 1)
+            hr.fill_diagonal_(1)
             hr = pad_HR_adj(hr, args.padding)
-            hr = torch.from_numpy(hr).type(torch.FloatTensor)
+            #hr = torch.from_numpy(hr).type(torch.FloatTensor)
             preds, a, b, c = model(lr, args.lr_dim, args.hr_dim)
+            #preds = unpad(preds, args.padding)
 
             # if i == 0:
             #     print("Hr", hr)
@@ -101,14 +109,19 @@ def test(model, test_adj, test_labels, args):
             #                extent=[0, 10000, 0, 10], aspect=1000)
             #     plt.show(block=False)
 
-            preds_list.append(preds.flatten().detach().numpy())
-            error = criterion(preds, hr)
+            # preds_list.append(preds.flatten().detach().numpy())
+            preds_list.append(preds.flatten().detach())
+            error = criterion(preds, torch.from_numpy(hr))
+            error_mae = criterion_test(preds, torch.from_numpy(hr))
             g_t.append(hr.flatten())
             print(error.item())
             test_error.append(error.item())
+            test_error_mae.append(error_mae.item())
             # i += 1
 
     print("Test error MSE: ", np.mean(test_error))
+    print("Test error MAE: ", np.mean(test_error_mae))
+    print()
     # preds_list = [val for sublist in preds_list for val in sublist]
     # g_t_list = [val for sublist in g_t for val in sublist]
     # binwidth = 0.01

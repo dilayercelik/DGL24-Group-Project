@@ -36,6 +36,9 @@ def split_train_data(data, test_ratio=0.2):
 
 
 def generate_submission_file(prediction_tensors, filepath): 
+    """
+    Recommended file path is 'submission_files/xxxxxx.csv'
+    """
     vectorizer = MatrixVectorizer()
     all_vectorized_arr = np.concatenate([vectorizer.vectorize(matrix) for matrix in prediction_tensors])
     df = pd.DataFrame({'ID': list(range(1, len(all_vectorized_arr)+1)), 'Predicted': all_vectorized_arr})

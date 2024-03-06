@@ -11,9 +11,9 @@ class GSRLayer(nn.Module):
 
     def __init__(self, hr_dim):
         super(GSRLayer, self).__init__()
+        self.device = torch.device('cuda')
+        self.weights = torch.from_numpy(weight_variable_glorot(hr_dim)).float().to(self.device)
 
-        self.weights = torch.from_numpy(
-            weight_variable_glorot(hr_dim)).type(torch.FloatTensor)
         self.weights = torch.nn.Parameter(
             data=self.weights, requires_grad=True)
 
@@ -29,7 +29,7 @@ class GSRLayer(nn.Module):
             eig_val_lr, U_lr = torch.linalg.eigh(lr, UPLO='U')
 
             # U_lr = torch.abs(U_lr)
-            eye_mat = torch.eye(lr_dim).type(torch.FloatTensor)
+            eye_mat = torch.eye(lr_dim, device=self.device).type(torch.FloatTensor)
             s_d = torch.cat((eye_mat, eye_mat), 0)
 
             a = torch.matmul(self.weights, s_d)
@@ -52,18 +52,20 @@ class GraphConvolution(nn.Module):
 
     def __init__(self, in_features, out_features, dropout, act=F.relu):
         super(GraphConvolution, self).__init__()
+        self.device = torch.device('cuda')
         self.in_features = in_features
         self.out_features = out_features
         self.dropout = dropout
         self.act = act
         self.weight = torch.nn.Parameter(
-            torch.FloatTensor(in_features, out_features))
+            torch.FloatTensor(in_features, out_features)).to(self.device)
         self.reset_parameters()
 
     def reset_parameters(self):
         torch.nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, adj):
+        input = input.to(self.weight.device)
         input = F.dropout(input, self.dropout, self.training)
         support = torch.mm(input, self.weight)
         output = torch.mm(adj, support)

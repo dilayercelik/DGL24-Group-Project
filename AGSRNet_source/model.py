@@ -10,22 +10,22 @@ class AGSRNet(nn.Module):
 
     def __init__(self, ks, args):
         super(AGSRNet, self).__init__()
-
+        self.device = torch.device('cuda')
+        
         self.lr_dim = args.lr_dim
         self.hr_dim = args.hr_dim
         self.hidden_dim = args.hidden_dim
-        self.layer = GSRLayer(self.hr_dim)
-        self.net = GraphUnet(ks, self.lr_dim, self.hr_dim)
+        self.layer = GSRLayer(self.hr_dim).to(self.device)
+        self.net = GraphUnet(ks, self.lr_dim, self.hr_dim).to(self.device)
         self.gc1 = GraphConvolution(
-            self.hr_dim, self.hidden_dim, 0, act=F.relu)
+            self.hr_dim, self.hidden_dim, 0, act=F.relu).to(self.device)
         self.gc2 = GraphConvolution(
-            self.hidden_dim, self.hr_dim, 0, act=F.relu)
+            self.hidden_dim, self.hr_dim, 0, act=F.relu).to(self.device)
 
     def forward(self, lr, lr_dim, hr_dim):
         with torch.autograd.set_detect_anomaly(True):
 
-            I = torch.eye(self.lr_dim).type(torch.FloatTensor)
-            A = normalize_adj_torch(lr).type(torch.FloatTensor)
+            I = torch.eye(self.lr_dim, device=self.device).float()  
 
             self.net_outs, self.start_gcn_outs = self.net(A, I)
 
@@ -44,8 +44,9 @@ class AGSRNet(nn.Module):
 class Dense(nn.Module):
     def __init__(self, n1, n2, args):
         super(Dense, self).__init__()
+        self.device = torch.device('cuda')
         self.weights = torch.nn.Parameter(
-            torch.FloatTensor(n1, n2), requires_grad=True)
+            torch.FloatTensor(n1, n2), device=self.device, requires_grad=True)
         nn.init.normal_(self.weights, mean=args.mean_dense, std=args.std_dense)
 
     def forward(self, x):
@@ -78,7 +79,8 @@ class Discriminator(nn.Module):
 
 
 def gaussian_noise_layer(input_layer, args):
-    z = torch.empty_like(input_layer)
+    device = torch.device('cuda')
+    z = torch.empty_like(input_layer).to(device)
     noise = z.normal_(mean=args.mean_gaussian, std=args.std_gaussian)
     z = torch.abs(input_layer + noise)
 

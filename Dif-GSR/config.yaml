@@ -20,12 +20,13 @@ Sampling:
   source_dim: 160 #EDITED Moritz
   batch_size: 16
   n_feat: 48
+  three_layers: True
 
 
 
 
 Diffusion:
-  three_layers: False
+  three_layers: True
   accelerator: 'gpu'
   batch_size: 16
   epochs: 100
@@ -45,7 +46,7 @@ Diffusion:
 
   n_T: 400
 
-  lr: 0.001
+  lr: 0.0005
 
 
 

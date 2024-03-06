@@ -33,7 +33,8 @@ for fn in range(3):
 
     ddpm = DDPM(denoising_model=ContextUnet(in_channels=1,
                                             n_feat=n_feat,
-                                            n_classes=source_dim),
+                                            n_classes=source_dim,
+                                            three_layers=config["Sampling"]["three_layers"]),
                 beta1=config["Diffusion"]["beta1"],
                 beta2=config["Diffusion"]["beta2"],
                 n_T=config["Diffusion"]["n_T"],

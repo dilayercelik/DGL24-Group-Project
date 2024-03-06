@@ -17,7 +17,7 @@ class GSRLayer(nn.Module):
     #self.weights = torch.nn.Parameter(data=self.weights, requires_grad = True)
     initial_weights = weight_variable_glorot(hr_dim)
     self.weights = torch.nn.Parameter(data=torch.tensor(initial_weights, device=self.device, dtype=torch.float), requires_grad=True)
-
+    
   def forward(self,A,X):
     lr = A
     lr_dim = lr.shape[0]
@@ -28,8 +28,10 @@ class GSRLayer(nn.Module):
     # U_lr = torch.abs(U_lr)
     #eye_mat = torch.eye(lr_dim).type(torch.FloatTensor)
     eye_mat = torch.eye(lr_dim, device=self.device, dtype=torch.float)
+    
+    #zero_matrix = torch.zeros((160, 108)).to(X.device)
 
-    s_d = torch.cat((eye_mat,eye_mat),0)
+    s_d = torch.cat((eye_mat,eye_mat),0)  # it was eye_mat,eye_mat
     
     a = torch.matmul(self.weights,s_d )
     b = torch.matmul(a ,torch.t(U_lr))
@@ -39,7 +41,7 @@ class GSRLayer(nn.Module):
     adj = normalize_adj_torch(self.f_d)
     X = torch.mm(adj, adj.t())
     X = (X + X.t())/2
-    idx = torch.eye(320, dtype=bool)
+    idx = torch.eye(320, dtype=bool)  
     X[idx]=1
     return adj, torch.abs(X)
     

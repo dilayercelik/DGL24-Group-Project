@@ -25,7 +25,8 @@ class AGSRNet(nn.Module):
     def forward(self, lr, lr_dim, hr_dim):
         with torch.autograd.set_detect_anomaly(True):
 
-            I = torch.eye(self.lr_dim, device=self.device).float()  
+            I = torch.eye(self.lr_dim, device=self.device).float() 
+            A = normalize_adj_torch(lr).float().to(self.device)
 
             self.net_outs, self.start_gcn_outs = self.net(A, I)
 
@@ -45,8 +46,8 @@ class Dense(nn.Module):
     def __init__(self, n1, n2, args):
         super(Dense, self).__init__()
         self.device = torch.device('cuda')
-        self.weights = torch.nn.Parameter(
-            torch.FloatTensor(n1, n2), device=self.device, requires_grad=True)
+        self.weights = torch.nn.Parameter(torch.empty(n1, n2, device=self.device, dtype=torch.float).normal_(), requires_grad=True)
+
         nn.init.normal_(self.weights, mean=args.mean_dense, std=args.std_dense)
 
     def forward(self, x):

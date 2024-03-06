@@ -2,15 +2,19 @@ import torch
 import numpy as np
 import os
 import scipy.io
+import torch.nn.functional as F
 
 path = 'drive/My Drive/BRAIN_DATASET'
 roi_str = 'ROI_FC.mat'
 
 
 def pad_HR_adj(label, split):
-
-    label = np.pad(label, ((split, split), (split, split)), mode="constant")
-    np.fill_diagonal(label, 1)
+    # Convert input to tensor if it's not already
+    label = torch.tensor(label, dtype=torch.float32)
+    # Apply padding
+    label = F.pad(label, (split, split, split, split), "constant", 0)
+    # Fill diagonal with 1
+    label.fill_diagonal_(1)
     return label
 
 
@@ -23,6 +27,7 @@ def normalize_adj_torch(mx):
     mx = torch.matmul(mx, r_mat_inv_sqrt)
     mx = torch.transpose(mx, 0, 1)
     mx = torch.matmul(mx, r_mat_inv_sqrt)
+    mx = mx.to(device)
     return mx
 
 
@@ -38,33 +43,32 @@ def extract_data(subject, session_str, parcellation_str, subjects_roi):
     folder_path = os.path.join(
         path, str(subject), session_str, parcellation_str)
     roi_data = scipy.io.loadmat(os.path.join(folder_path, roi_str))
-    roi = roi_data['r']
-
+    roi = torch.tensor(roi_data['r'], dtype=torch.float32)
+    
     # Replacing NaN values
-    col_mean = np.nanmean(roi, axis=0)
-    inds = np.where(np.isnan(roi))
-    roi[inds] = 1
-
+    roi[torch.isnan(roi)] = torch.tensor(1.0)
+    
     # Taking the absolute values of the matrix
-    roi = np.absolute(roi, dtype=np.float32)
-
+    roi = torch.abs(roi)
+    
     if parcellation_str == 'shen_268':
-        roi = np.reshape(roi, (1, 268, 268))
+        roi = roi.reshape(1, 268, 268)
     else:
-        roi = np.reshape(roi, (1, 160, 160))
-
+        roi = roi.reshape(1, 160, 160)
+    
     if subject == 25629:
         subjects_roi = roi
     else:
-        subjects_roi = np.concatenate((subjects_roi, roi), axis=0)
+        # Concatenate along the first dimension
+        subjects_roi = torch.cat((subjects_roi, roi), dim=0)
 
     return subjects_roi
 
 
 def load_data(start_value, end_value):
 
-    subjects_label = np.zeros((1, 268, 268))
-    subjects_adj = np.zeros((1, 160, 160))
+    subjects_label = torch.zeros(1, 268, 268, dtype=torch.float32)
+    subjects_adj = torch.zeros(1, 160, 160, dtype=torch.float32)
 
     for subject in range(start_value, end_value):
         subject_path = os.path.join(path, str(subject))
@@ -83,6 +87,6 @@ def data():
     subjects_adj, subjects_labels = load_data(25629, 25830)
     test_adj_1, test_labels_1 = load_data(25831, 25863)
     test_adj_2, test_labels_2 = load_data(30701, 30757)
-    test_adj = np.concatenate((test_adj_1, test_adj_2), axis=0)
-    test_labels = np.concatenate((test_labels_1, test_labels_2), axis=0)
+    test_adj = torch.cat((test_adj_1, test_adj_2), dim=0)
+    test_labels = torch.cat((test_labels_1, test_labels_2), dim=0)
     return subjects_adj, subjects_labels, test_adj, test_labels

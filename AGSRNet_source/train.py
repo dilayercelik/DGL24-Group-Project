@@ -27,9 +27,9 @@ def train(model, subjects_adj, subjects_labels, args):
                 optimizerD.zero_grad()
                 optimizerG.zero_grad()
                 
-                hr = pad_HR_adj(hr, args.padding)
+                padded_hr = pad_HR_adj(hr, args.padding)
                 #lr = torch.from_numpy(lr).type(torch.FloatTensor)
-                padded_hr = torch.from_numpy(hr).type(torch.FloatTensor)
+                #padded_hr = torch.from_numpy(hr).type(torch.FloatTensor)
 
                 # NOTE: torch.symeig was deprecated in torch version 1.9
                 # eig_val_hr, U_hr = torch.symeig(
@@ -46,8 +46,8 @@ def train(model, subjects_adj, subjects_labels, args):
                 real_data = model_outputs.detach()
                 fake_data = gaussian_noise_layer(padded_hr, args)
 
-                d_real = netD(real_data)
-                d_fake = netD(fake_data)
+                d_real = netD(real_data).to(real_data.device)
+                d_fake = netD(fake_data).to(fake_data.device)
 
                 dc_loss_real = bce_loss(d_real, torch.ones(args.hr_dim, 1))
                 dc_loss_fake = bce_loss(d_fake, torch.zeros(args.hr_dim, 1))

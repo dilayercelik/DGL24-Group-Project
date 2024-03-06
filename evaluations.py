@@ -22,8 +22,8 @@ gt_matrices = torch.randn(num_test_samples, num_roi, num_roi).numpy()
 # you do NOT need to that since the ground-truth data we provided you is alread pre-processed.
 
 def evaluate(pred_matrices, gt_matrices):
-    pred_matrices = pred_matrices.cpu().numpy()
-    gt_matrices = gt_matrices.cpu().numpy()
+    pred_matrices = pred_matrices.numpy()
+    gt_matrices = gt_matrices.numpy()
     gt_matrices[gt_matrices < 0] = 0
     pred_1d_list = []
     gt_1d_list = []
@@ -34,6 +34,8 @@ def evaluate(pred_matrices, gt_matrices):
 
     # Iterate over each test sample
     for i in range(len(pred_matrices)):
+        print(i)
+        print()
         # Convert adjacency matrices to NetworkX graphs
         pred_graph = nx.from_numpy_array(pred_matrices[i], edge_attr="weight")
         gt_graph = nx.from_numpy_array(gt_matrices[i], edge_attr="weight")

@@ -29,14 +29,22 @@ class GSRNet(nn.Module):
     #A = normalize_adj_torch(lr).type(torch.FloatTensor)
 
     self.net_outs, self.start_gcn_outs = self.net(A, I)
+    #print(self.net_outs.size())
+    #print(self.start_gcn_outs.size())
     #print('passed')
     
     self.outputs, self.Z = self.layer(A, self.net_outs)
+    #print(self.outputs.size())
+    #print(self.Z.size())
     #print('passed')
     
     self.hidden1 = self.gc1(self.Z, self.outputs)
+    #print(self.Z.size())
+    #print(self.outputs.size())
     #print('passed')
     self.hidden2 = self.gc2(self.hidden1, self.outputs)
+    #print(self.hidden1.size())
+    #print(self.outputs.size())
     #print('passed')
 
     z = self.hidden2

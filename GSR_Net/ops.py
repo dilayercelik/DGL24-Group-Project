@@ -55,7 +55,7 @@ class GCN(nn.Module):
 
 class GraphUnet(nn.Module):
 
-    def __init__(self, ks, in_dim, out_dim, dim=320):
+    def __init__(self, ks, in_dim, out_dim, dim=320):  # it was 320
         super(GraphUnet, self).__init__()
         self.ks = ks
         self.device = torch.device('cuda')
@@ -98,5 +98,7 @@ class GraphUnet(nn.Module):
             X = X.add(down_outs[up_idx])
         X = torch.cat([X, org_X], 1)
         X = self.end_gcn(A, X)
+        #print(X.size())
+        #print(start_gcn_outs.size())
         
         return X, start_gcn_outs

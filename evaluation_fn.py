@@ -35,6 +35,9 @@ def evaluate_predictions(tensor_pred, tensor_true):
     mae_ec = []
     mae_pc = []
 
+    pred_1d_list = []
+    gt_1d_list = []
+
     # Iterate over each test sample
     for i in range(len(tensor_pred)):
 
@@ -69,8 +72,8 @@ def evaluate_predictions(tensor_pred, tensor_true):
         mae_pc.append(mean_absolute_error(pred_pc_values, gt_pc_values))
 
         # Vectorize matrices
-        pred_1d_list.append(MatrixVectorizer.vectorize(pred_matrices[i]))
-        gt_1d_list.append(MatrixVectorizer.vectorize(gt_matrices[i]))
+        pred_1d_list.append(MatrixVectorizer.vectorize(pred_matrix))
+        gt_1d_list.append(MatrixVectorizer.vectorize(true_matrix))
 
     # Compute average MAEs
     avg_mae_bc = sum(mae_bc) / len(mae_bc)

@@ -7,9 +7,6 @@ import yaml
 from utils import anti_vectorize,h_i
 from sklearn.model_selection import KFold
 
-
-
-
 def prepare_cross_validation_data(config):
     func_data = pd.read_csv(config["Data"]["functional_data"]) #EDITED Moritz
     morph_data = pd.read_csv(config["Data"]["morphological_data"]) #EDITED Moritz

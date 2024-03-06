@@ -45,7 +45,8 @@ for fold in range(3):
 
     nn = ContextUnet(in_channels=1,
                      n_feat=config["Diffusion"]["n_feat"],
-                     n_classes=config["Diffusion"]["source_dim"]**2)
+                     n_classes=config["Diffusion"]["source_dim"]**2,
+                     three_layers=config["Diffusion"]["three_layers"])
 
     model = DDPM(denoising_model=nn,
                  beta1=config["Diffusion"]["beta1"],

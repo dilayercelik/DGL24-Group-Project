@@ -49,8 +49,8 @@ def train(model, subjects_adj, subjects_labels, args):
                 d_real = netD(real_data).to(real_data.device)
                 d_fake = netD(fake_data).to(fake_data.device)
 
-                dc_loss_real = bce_loss(d_real, torch.ones(args.hr_dim, 1))
-                dc_loss_fake = bce_loss(d_fake, torch.zeros(args.hr_dim, 1))
+                dc_loss_real = bce_loss(d_real, torch.ones(args.hr_dim, 1).to(d_real.device))
+                dc_loss_fake = bce_loss(d_fake, torch.zeros(args.hr_dim, 1).to(d_fake.device))
                 dc_loss = dc_loss_real + dc_loss_fake
 
                 dc_loss.backward()
@@ -58,7 +58,7 @@ def train(model, subjects_adj, subjects_labels, args):
 
                 d_fake = netD(gaussian_noise_layer(padded_hr, args))
 
-                gen_loss = bce_loss(d_fake, torch.ones(args.hr_dim, 1))
+                gen_loss = bce_loss(d_fake, torch.ones(args.hr_dim, 1).to(d_fake.device))
                 generator_loss = gen_loss + mse_loss
                 generator_loss.backward()
                 optimizerG.step()
@@ -111,8 +111,8 @@ def test(model, test_adj, test_labels, args):
 
             # preds_list.append(preds.flatten().detach().numpy())
             preds_list.append(preds.flatten().detach())
-            error = criterion(preds, torch.from_numpy(hr))
-            error_mae = criterion_test(preds, torch.from_numpy(hr))
+            error = criterion(preds, hr)
+            error_mae = criterion_test(preds, hr)
             g_t.append(hr.flatten())
             print(error.item())
             test_error.append(error.item())

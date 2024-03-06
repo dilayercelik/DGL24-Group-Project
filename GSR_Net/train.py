@@ -33,8 +33,8 @@ def train(model, optimizer, subjects_adj,subjects_labels, args):
           padded_hr = pad_HR_adj(hr,args.padding)
           #eig_val_hr, U_hr = torch.symeig(padded_hr, eigenvectors=True,upper=True)
           eig_val_hr, U_hr = torch.linalg.eigh(padded_hr, UPLO='U')
-          print(model.layer.weights.size())
-          print(U_hr.size())
+          #print(model.layer.weights.size())
+          #print(U_hr.size())
           loss = args.lmbda * criterion(net_outs, start_gcn_outs) + criterion(model.layer.weights,U_hr) + criterion(model_outputs, hr) 
           
           error = criterion(model_outputs, hr)

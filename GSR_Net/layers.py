@@ -16,7 +16,8 @@ class GSRLayer(nn.Module):
     #self.weights = weight_variable_glorot(hr_dim)
     #self.weights = torch.nn.Parameter(data=self.weights, requires_grad = True)
     initial_weights = weight_variable_glorot(hr_dim)
-    self.weights = torch.nn.Parameter(data=torch.tensor(initial_weights, device=self.device, dtype=torch.float), requires_grad=True)
+    self.weights = torch.nn.Parameter(torch.tensor(initial_weights, dtype=torch.float).to(self.device))
+
     
   def forward(self,A,X):
     lr = A

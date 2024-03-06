@@ -69,10 +69,10 @@ class GraphUnet(nn.Module):
         self.unpools = []
         self.l_n = len(ks)
         for i in range(self.l_n):
-            self.down_gcns.append(GCN(dim, dim)).to(self.device)
-            self.up_gcns.append(GCN(dim, dim)).to(self.device)
-            self.pools.append(GraphPool(ks[i], dim)).to(self.device)
-            self.unpools.append(GraphUnpool()).to(self.device)
+            self.down_gcns.append(GCN(dim, dim).to(self.device))
+            self.up_gcns.append(GCN(dim, dim).to(self.device))
+            self.pools.append(GraphPool(ks[i], dim).to(self.device))
+            self.unpools.append(GraphUnpool().to(self.device))
 
     def forward(self, A, X):
         adj_ms = []

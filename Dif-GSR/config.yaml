@@ -19,19 +19,20 @@ Sampling:
   save_dir: './results/Diffusion_Sample'
   source_dim: 160 #EDITED Moritz
   batch_size: 16
-  n_feat: 32
+  n_feat: 48
 
 
 
 
 Diffusion:
+  three_layers: False
   accelerator: 'gpu'
-  batch_size: 32
+  batch_size: 16
   epochs: 100
   save_dir: './results/Diffusion_Train'
   dropout_prob: 0.2
   fast_dev_run: False
-  n_feat: 32
+  n_feat: 48
   source_dim: 160 #EDITED Moritz
   target_dim: 268  #EDITED Moritz
 

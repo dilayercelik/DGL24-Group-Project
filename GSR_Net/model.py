@@ -9,49 +9,30 @@ class GSRNet(nn.Module):
 
   def __init__(self,ks,args):
     super(GSRNet, self).__init__()
-    self.device = torch.device('cuda')
     
     self.lr_dim = args.lr_dim
     self.hr_dim = args.hr_dim
     self.hidden_dim = args.hidden_dim
-    self.layer = GSRLayer(self.hr_dim).to(self.device)
-    self.net = GraphUnet(ks, self.lr_dim, self.hr_dim).to(self.device)
-    self.gc1 = GraphConvolution(self.hr_dim, self.hidden_dim, 0, act=F.relu).to(self.device)
-    self.gc2 = GraphConvolution(self.hidden_dim, self.hr_dim, 0, act=F.relu).to(self.device)
+    self.layer = GSRLayer(self.hr_dim)
+    self.net = GraphUnet(ks, self.lr_dim, self.hr_dim)
+    self.gc1 = GraphConvolution(self.hr_dim, self.hidden_dim, 0, act=F.relu)
+    self.gc2 = GraphConvolution(self.hidden_dim, self.hr_dim, 0, act=F.relu)
 
   def forward(self,lr):
-    lr = lr.to(self.device)
-    #print('passed')  
-    I = torch.eye(self.lr_dim, device=self.device)  
-    A = normalize_adj_torch(lr).to(self.device)  
-    
-    #I = torch.eye(self.lr_dim).type(torch.FloatTensor)
-    #A = normalize_adj_torch(lr).type(torch.FloatTensor)
+
+    I = torch.eye(self.lr_dim).type(torch.FloatTensor)
+    A = normalize_adj_torch(lr).type(torch.FloatTensor)
 
     self.net_outs, self.start_gcn_outs = self.net(A, I)
-    #print(self.net_outs.size())
-    #print(self.start_gcn_outs.size())
-    #print('passed')
     
     self.outputs, self.Z = self.layer(A, self.net_outs)
-    #print(self.outputs.size())
-    #print(self.Z.size())
-    #print('passed')
     
     self.hidden1 = self.gc1(self.Z, self.outputs)
-    #print(self.Z.size())
-    #print(self.outputs.size())
-    #print('passed')
     self.hidden2 = self.gc2(self.hidden1, self.outputs)
-    #print(self.hidden1.size())
-    #print(self.outputs.size())
-    #print('passed')
 
     z = self.hidden2
     z = (z + z.t())/2
-    #print('passed')
     idx = torch.eye(self.hr_dim, dtype=bool) 
-    #print('passed')
     z[idx]=1
     
     return torch.abs(z), self.net_outs, self.start_gcn_outs, self.outputs

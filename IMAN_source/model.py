@@ -69,7 +69,6 @@ class Generator(nn.Module):
         self.conv3 = NNConv(N_SOURCE_NODES, N_TARGET_NODES, nn, aggr='mean', root_weight=True, bias=True)
         self.conv33 = BatchNorm(N_TARGET_NODES, eps=1e-03, momentum=0.1, affine=True, track_running_stats=True)
 
-
         # self.layer= torch.nn.ConvTranspose2d(N_TARGET_NODES, N_TARGET_NODES,5)
 
 

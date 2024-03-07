@@ -59,7 +59,9 @@ for fold in range(3):
 
     model.to(device)
 
-    optim = torch.optim.Adam(model.parameters(), lr=config["Diffusion"]["lr"])
+    lr=config["Diffusion"]["lr"]
+
+    optim = torch.optim.Adam(model.parameters(), lr=lr)
 
     for ep in range(n_epoch):
         print(f'epoch {ep}')
@@ -96,5 +98,5 @@ for fold in range(3):
                 pbar.set_description(f"val_loss: {loss:.4f}")
 
     with torch.no_grad():
-        with open(config["Diffusion"][f"load_dir_{fold+1}"], "wb") as f:
+        with open(config["Diffusion"][f"load_dir_{fold+1}_lr{lr}"], "wb") as f:
             torch.save(model.state_dict(), f)

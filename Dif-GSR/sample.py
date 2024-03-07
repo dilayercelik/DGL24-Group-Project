@@ -33,7 +33,8 @@ for fn in range(3):
 
     ddpm = DDPM(denoising_model=ContextUnet(in_channels=1,
                                             n_feat=n_feat,
-                                            n_classes=source_dim),
+                                            n_classes=source_dim,
+                                            three_layers=config["Sampling"]["three_layers"]),
                 beta1=config["Diffusion"]["beta1"],
                 beta2=config["Diffusion"]["beta2"],
                 n_T=config["Diffusion"]["n_T"],
@@ -46,6 +47,7 @@ for fn in range(3):
     real = []
     with torch.no_grad():
         for c in tqdm(dl):
+            print(c)
             real.append(c[0].detach().cpu())
             c = c[1].to(device)
             x_gen = ddpm.sample(c.shape[0], (1, 268, 268), device, c, guide_w=g) #EDITED Moritz

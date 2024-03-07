@@ -1,6 +1,7 @@
 Data:
   functional_data: "./data/hr_train.csv" #EDITED Moritz
   morphological_data: "./data/lr_train.csv" #EDITED Moritz
+  test_data: "./data/lr_test.csv"
 
 Seed:
   seed: 11
@@ -20,6 +21,7 @@ Sampling:
   source_dim: 160 #EDITED Moritz
   batch_size: 16
   n_feat: 48
+  three_layers: False
 
 
 
@@ -39,6 +41,7 @@ Diffusion:
   load_dir_1: './results/Diffusion_Train/fold_1.ckpt'
   load_dir_2: './results/Diffusion_Train/fold_2.ckpt'
   load_dir_3: './results/Diffusion_Train/fold_3.ckpt'
+  load_dir_full: './results/Diffusion_Train/full.ckpt'
 
   beta1: 0.0001
   beta2: 0.02

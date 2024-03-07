@@ -43,3 +43,5 @@ def generate_submission_file(prediction_tensors, filepath):
     all_vectorized_arr = np.concatenate([vectorizer.vectorize(matrix) for matrix in prediction_tensors])
     df = pd.DataFrame({'ID': list(range(1, len(all_vectorized_arr)+1)), 'Predicted': all_vectorized_arr})
     df.to_csv(filepath, index=False)
+    
+    

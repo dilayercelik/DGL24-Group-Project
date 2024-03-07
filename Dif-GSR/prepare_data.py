@@ -23,8 +23,6 @@ def prepare_cross_validation_data(config):
     for fold_idx, (train_indices, test_indices) in enumerate(kf.split(indices)):
         data_dict[fold_idx] = ((func_data[train_indices], morph_data[train_indices]),(func_data[test_indices], morph_data[test_indices]))
 
-
-
     return data_dict
 
 

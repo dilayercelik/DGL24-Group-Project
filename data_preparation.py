@@ -40,3 +40,42 @@ def generate_submission_file(prediction_tensors, filepath):
     all_vectorized_arr = np.concatenate([vectorizer.vectorize(matrix) for matrix in prediction_tensors])
     df = pd.DataFrame({'ID': list(range(1, len(all_vectorized_arr)+1)), 'Predicted': all_vectorized_arr})
     df.to_csv(filepath, index=False)
+    return df
+
+def new_generate_submission_file(prediction_tensors, filepath): 
+    """
+    Recommended file path is 'submission_files/xxxxxx.csv'
+
+    input:
+    - prediction_tensor: torch.tensor should be of shape [N,268,268] in same order as lr_test.csv
+    """
+    vectorizer = MatrixVectorizer()
+    vectorized = np.array([vectorizer.vectorize(prediction_tensors[i].numpy()) for i in range(prediction_tensors.shape[0])])
+    meltedDF = vectorized.flatten()
+    df = pd.DataFrame({'ID': list(range(1, len(meltedDF)+1)), 'Predicted': meltedDF})
+    df.to_csv(filepath, index=False)
+    return df
+
+def alt_generate_submission_file(prediction_tensors, filepath): 
+    """
+    Recommended file path is 'submission_files/xxxxxx.csv'
+
+    input:
+    - prediction_tensor: torch.tensor should be of shape [N,268,268] in same order as lr_test.csv
+    """
+
+    data = {
+        'ID': [],
+        'Predicted': []
+    }
+    vectorizer = MatrixVectorizer()
+    vectorized = np.array([vectorizer.vectorize(prediction_tensors[i]) for i in range(prediction_tensors.shape[0])])
+    id = 1
+    for flattend in vectorized:
+        for value in flattend:
+            data['ID'].append(id)
+            data['Predicted'].append(value)
+            id = id + 1
+    df = pd.DataFrame(data)
+    df.to_csv(filepath, index=False)
+    return df

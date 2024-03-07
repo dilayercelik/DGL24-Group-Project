@@ -25,15 +25,12 @@ def load_data_tensor(path_to_datasets):
     # NOTE the order of return is low res train, low res test, high res train
     return Tensor(lr_train), Tensor(lr_test), Tensor(hr_train)
 
-
 def split_train_data(data, test_ratio=0.2):
     n = data.size(0)
     split_idx = int(n * (1-test_ratio))
     train_data, val_data = data[:split_idx, :, :], data[split_idx:, : , :]
     
     return train_data, val_data
-
-
 
 def generate_submission_file(prediction_tensors, filepath): 
     """

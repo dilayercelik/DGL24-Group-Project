@@ -47,6 +47,7 @@ for fn in range(3):
     real = []
     with torch.no_grad():
         for c in tqdm(dl):
+            print(c)
             real.append(c[0].detach().cpu())
             c = c[1].to(device)
             x_gen = ddpm.sample(c.shape[0], (1, 268, 268), device, c, guide_w=g) #EDITED Moritz

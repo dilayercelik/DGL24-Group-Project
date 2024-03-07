@@ -68,6 +68,20 @@ class DDPM(nn.Module):
 
         return self.loss_mse(noise, self.nn_model(x_t, c, _ts / self.n_T, context_mask))
 
+    def predict(self, x, c):
+
+        _ts = torch.randint(1, self.n_T + 1, (x.shape[0],)).to(self.device)  # t ~ Uniform(0, n_T)
+        noise = torch.randn_like(x)
+
+        x_t = (
+                self.sqrtab[_ts, None, None, None] * x
+                + self.sqrtmab[_ts, None, None, None] * noise
+        )
+        context_mask = torch.bernoulli(torch.zeros_like(_ts) + self.drop_prob).to(self.device)
+
+        return self.nn_model(x_t, c, _ts / self.n_T, context_mask)
+
+
     def sample(self, n_sample, size, device, context_i_1, guide_w=0.0):
 
         x_i = torch.randn(n_sample, *size).to(device)

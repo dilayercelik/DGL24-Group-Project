@@ -124,7 +124,7 @@ class DiffusionGraphDataModule(pl.LightningDataModule):
             dataloaders.append(DataLoader(self.datasets[fold]['test'], batch_size=self.batch_size))
         return dataloaders
 
-def connectomes_data_loader(source_data, target_data, batch_size=32):
+def connectomes_data_loader(source_data, target_data, batch_size=32, num_folds=3, only_test=False):
 
     if source_data is None and target_data is None:
         #create random numpy data
@@ -134,7 +134,6 @@ def connectomes_data_loader(source_data, target_data, batch_size=32):
     else:
         source_data = np.array(pd.read_csv(source_data))
         target_data = np.array(pd.read_csv(target_data))
-
 
     source_data = anti_vectorize(source_data, h=False, num_nodes=config["Diffusion"]["source_dim"])
     target_data = anti_vectorize(target_data, h=True, num_nodes=config["Diffusion"]["target_dim"])

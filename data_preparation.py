@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from torch import Tensor
 from MatrixVectorizer import MatrixVectorizer
+import matplotlib.pyplot as plt
 
 def multi_anti_vectorize(arr, vectorizer, matrix_size): 
     return np.array([vectorizer.anti_vectorize(v, matrix_size) for v in arr])
@@ -41,6 +42,20 @@ def generate_submission_file(prediction_tensors, filepath):
     df = pd.DataFrame({'ID': list(range(1, len(all_vectorized_arr)+1)), 'Predicted': all_vectorized_arr})
     df.to_csv(filepath, index=False)
     return df
+
+def generate_histogram(test_pred_tensor, target=None):
+    flattened_tensor = test_pred_tensor.flatten() 
+    # Create the histogram
+    plt.hist(flattened_tensor, bins=50, density=True)  # You can adjust the number of bins based on your data's distribution
+    if not target==None:
+        flattened_target = target.flatten()
+        plt.hist(flattened_target, bins=50, alpha=0.5, label='Target', density=True)
+    plt.title('Histogram of Tensor Values')
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+
+    # Show the plot
+    plt.show()
 
 def new_generate_submission_file(prediction_tensors, filepath): 
     """

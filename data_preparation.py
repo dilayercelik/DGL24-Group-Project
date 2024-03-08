@@ -51,6 +51,7 @@ def new_generate_submission_file(prediction_tensors, filepath):
     """
     vectorizer = MatrixVectorizer()
     vectorized = np.array([vectorizer.vectorize(prediction_tensors[i].numpy()) for i in range(prediction_tensors.shape[0])])
+    print(vectorized.shape)
     meltedDF = vectorized.flatten()
     df = pd.DataFrame({'ID': list(range(1, len(meltedDF)+1)), 'Predicted': meltedDF})
     df.to_csv(filepath, index=False)

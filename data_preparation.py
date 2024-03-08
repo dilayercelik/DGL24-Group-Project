@@ -45,17 +45,20 @@ def generate_submission_file(prediction_tensors, filepath):
 
 def generate_histogram(test_pred_tensor, target=None):
     flattened_tensor = test_pred_tensor.flatten() 
-    # Create the histogram
-    plt.hist(flattened_tensor, bins=50, density=True)  # You can adjust the number of bins based on your data's distribution
-    if not target==None:
+    # Create the histogram for predictions in purple
+    plt.hist(flattened_tensor, alpha=0.5, bins=50, density=True, color='purple', label='Prediction')  
+    if target is not None:
         flattened_target = target.flatten()
-        plt.hist(flattened_target, bins=50, alpha=0.5, label='Target', density=True)
+        # Create the histogram for ground truth in yellow
+        plt.hist(flattened_target, bins=50, alpha=0.5, color='orange', label='Ground Truth', density=True)
     plt.title('Histogram of Tensor Values')
     plt.xlabel('Value')
     plt.ylabel('Frequency')
+    plt.legend() # This will show the labels in the plot
 
     # Show the plot
     plt.show()
+
 
 def new_generate_submission_file(prediction_tensors, filepath): 
     """

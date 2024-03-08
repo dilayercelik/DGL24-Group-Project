@@ -9,9 +9,7 @@ class GraphUnpool(nn.Module):
         super(GraphUnpool, self).__init__()
 
     def forward(self, A, X, idx):
-        device = X.device
-        #new_X = torch.zeros([A.shape[0], X.shape[1]])
-        new_X = torch.zeros([A.shape[0], X.shape[1]], device=device)
+        new_X = torch.zeros([A.shape[0], X.shape[1]])
         new_X[idx] = X
         return A, new_X
 
@@ -55,24 +53,23 @@ class GCN(nn.Module):
 
 class GraphUnet(nn.Module):
 
-    def __init__(self, ks, in_dim, out_dim, dim=320):  # it was 320
+    def __init__(self, ks, in_dim, out_dim, dim=320):
         super(GraphUnet, self).__init__()
         self.ks = ks
-        self.device = torch.device('cuda')
-        
-        self.start_gcn = GCN(in_dim, dim).to(self.device)
-        self.bottom_gcn = GCN(dim, dim).to(self.device)
-        self.end_gcn = GCN(2*dim, out_dim).to(self.device)
+       
+        self.start_gcn = GCN(in_dim, dim)
+        self.bottom_gcn = GCN(dim, dim)
+        self.end_gcn = GCN(2*dim, out_dim)
         self.down_gcns = []
         self.up_gcns = []
         self.pools = []
         self.unpools = []
         self.l_n = len(ks)
         for i in range(self.l_n):
-            self.down_gcns.append(GCN(dim, dim).to(self.device))
-            self.up_gcns.append(GCN(dim, dim).to(self.device))
-            self.pools.append(GraphPool(ks[i], dim).to(self.device))
-            self.unpools.append(GraphUnpool().to(self.device))
+            self.down_gcns.append(GCN(dim, dim))
+            self.up_gcns.append(GCN(dim, dim))
+            self.pools.append(GraphPool(ks[i], dim))
+            self.unpools.append(GraphUnpool())
 
     def forward(self, A, X):
         adj_ms = []
@@ -98,7 +95,5 @@ class GraphUnet(nn.Module):
             X = X.add(down_outs[up_idx])
         X = torch.cat([X, org_X], 1)
         X = self.end_gcn(A, X)
-        #print(X.size())
-        #print(start_gcn_outs.size())
         
         return X, start_gcn_outs

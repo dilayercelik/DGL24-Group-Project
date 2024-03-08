@@ -27,9 +27,9 @@ def train(model, subjects_adj, subjects_labels, args):
                 optimizerD.zero_grad()
                 optimizerG.zero_grad()
                 
-                hr = pad_HR_adj(hr, args.padding)
+                padded_hr = pad_HR_adj(hr, args.padding)
                 #lr = torch.from_numpy(lr).type(torch.FloatTensor)
-                padded_hr = torch.from_numpy(hr).type(torch.FloatTensor)
+                padded_hr = torch.from_numpy(padded_hr).type(torch.FloatTensor)
 
                 # NOTE: torch.symeig was deprecated in torch version 1.9
                 # eig_val_hr, U_hr = torch.symeig(
@@ -38,12 +38,16 @@ def train(model, subjects_adj, subjects_labels, args):
 
                 model_outputs, net_outs, start_gcn_outs, layer_outs = model(
                     lr, args.lr_dim, args.hr_dim)
+                
+                real_data = model_outputs.detach()
+                
+                model_outputs = unpad(model_outputs, args.padding)
 
                 mse_loss = args.lmbda * criterion(net_outs, start_gcn_outs) + criterion(
-                    model.layer.weights, U_hr) + criterion(model_outputs, padded_hr)
+                    model.layer.weights, U_hr) + criterion(model_outputs, hr)
 
-                error = criterion(model_outputs, padded_hr)
-                real_data = model_outputs.detach()
+                error = criterion(model_outputs, hr)
+                #real_data = model_outputs.detach()
                 fake_data = gaussian_noise_layer(padded_hr, args)
 
                 d_real = netD(real_data)
@@ -91,9 +95,10 @@ def test(model, test_adj, test_labels, args):
             #lr = torch.from_numpy(lr).type(torch.FloatTensor)
             #np.fill_diagonal(hr, 1)
             hr.fill_diagonal_(1)
-            hr = pad_HR_adj(hr, args.padding)
+            #hr = pad_HR_adj(hr, args.padding)
             #hr = torch.from_numpy(hr).type(torch.FloatTensor)
             preds, a, b, c = model(lr, args.lr_dim, args.hr_dim)
+            preds = unpad(preds, args.padding)
             #preds = unpad(preds, args.padding)
 
             # if i == 0:
@@ -111,8 +116,8 @@ def test(model, test_adj, test_labels, args):
 
             # preds_list.append(preds.flatten().detach().numpy())
             preds_list.append(preds.flatten().detach())
-            error = criterion(preds, torch.from_numpy(hr))
-            error_mae = criterion_test(preds, torch.from_numpy(hr))
+            error = criterion(preds, hr)
+            error_mae = criterion_test(preds, hr)
             g_t.append(hr.flatten())
             print(error.item())
             test_error.append(error.item())

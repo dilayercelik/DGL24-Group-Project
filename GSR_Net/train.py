@@ -6,7 +6,6 @@ from GSR_Net.preprocessing import *
 from GSR_Net.model import *
 
 criterion = nn.MSELoss()
-criterion_test = nn.L1Loss()
 
 def train(model, optimizer, subjects_adj,subjects_labels, args):
   
@@ -33,8 +32,6 @@ def train(model, optimizer, subjects_adj,subjects_labels, args):
           padded_hr = pad_HR_adj(hr,args.padding)
           #eig_val_hr, U_hr = torch.symeig(padded_hr, eigenvectors=True,upper=True)
           eig_val_hr, U_hr = torch.linalg.eigh(padded_hr, UPLO='U')
-          print(model.layer.weights.size())
-          print(U_hr.size())
           loss = args.lmbda * criterion(net_outs, start_gcn_outs) + criterion(model.layer.weights,U_hr) + criterion(model_outputs, hr) 
           
           error = criterion(model_outputs, hr)
@@ -56,7 +53,6 @@ def train(model, optimizer, subjects_adj,subjects_labels, args):
 def test(model, test_adj, test_labels,args):
 
   test_error = []
-  test_error_mae = []
   preds_list=[]
   g_t = []
   
@@ -64,14 +60,11 @@ def test(model, test_adj, test_labels,args):
   # TESTING
   for lr, hr in zip(test_adj,test_labels):
 
-    #all_zeros_lr = not np.any(lr)
-    #all_zeros_hr = not np.any(hr)
     all_zeros_lr = torch.all(lr == 0)
     all_zeros_hr = torch.all(hr == 0)
 
     if all_zeros_lr == False and all_zeros_hr==False: #choose representative subject
       #lr = torch.from_numpy(lr).type(torch.FloatTensor)
-      #np.fill_diagonal(hr,1)
       hr.fill_diagonal_(1)
       #hr = torch.from_numpy(hr).type(torch.FloatTensor)
       preds,a,b,c = model(lr)
@@ -88,22 +81,16 @@ def test(model, test_adj, test_labels,args):
     #     plt.imshow(hr - preds.detach(), origin = 'upper',  extent = [-0.5, 268-0.5, 268-0.5, -0.5])
     #     plt.show(block=False)
       
-      #preds_list.append(preds.flatten().detach().numpy())
-      preds_list.append(preds.flatten().detach())
+      preds_list.append(preds.flatten().detach().numpy())
       
       error = criterion(preds, hr)
-      error_mae = criterion_test(preds, hr)
       g_t.append(hr.flatten())
       print(error.item())
       test_error.append(error.item())
-      test_error_mae.append(error_mae.item())
      
       i+=1
 
   print ("Test error MSE: ", np.mean(test_error))
-  print("Test error MAE: ", np.mean(test_error_mae))
-  print()
-  
   
   #plot histograms
 #   preds_list = [val for sublist in preds_list for val in sublist]

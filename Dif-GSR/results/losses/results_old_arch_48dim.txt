@@ -1,0 +1,4 @@
+MAE: 0.16285715997219086
+Eigen Vector Centrality:  0.006522
+Betweenness Centrality:  0.000500
+Closeness Centrality:  0.096918

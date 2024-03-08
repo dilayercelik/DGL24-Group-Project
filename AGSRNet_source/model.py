@@ -34,7 +34,10 @@ class AGSRNet(nn.Module):
             self.hidden1 = self.gc1(self.Z, self.outputs)
             self.hidden2 = self.gc2(self.hidden1, self.outputs)
             z = self.hidden2
-
+            
+            out = F.relu(self.hidden2)
+            out = F.tanh(out)
+            z = out
             z = (z + z.t())/2
             z = z.fill_diagonal_(1)
 

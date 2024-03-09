@@ -6,6 +6,7 @@ from scipy.spatial.distance import jensenshannon
 import torch
 import networkx as nx
 import numpy as np
+from tqdm import tqdm
 
 # # the following numbers do not reflect the provided dataset, just for an example
 # num_test_samples = 20
@@ -40,7 +41,7 @@ def evaluate_predictions(tensor_pred, tensor_true):
     gt_1d_list = []
 
     # Iterate over each test sample
-    for i in range(len(tensor_pred)):
+    for i in tqdm(range(len(tensor_pred)), desc='Evaluating Predictions (Can be Slow)'):
 
         pred_matrix = tensor_pred[i].cpu().detach().numpy()
         true_matrix = tensor_true[i].cpu().detach().numpy()

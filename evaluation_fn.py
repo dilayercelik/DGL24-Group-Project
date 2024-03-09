@@ -42,8 +42,8 @@ def evaluate_predictions(tensor_pred, tensor_true):
     # Iterate over each test sample
     for i in range(len(tensor_pred)):
 
-        pred_matrix = tensor_pred[i].detach().numpy()
-        true_matrix = tensor_true[i].detach().numpy()
+        pred_matrix = tensor_pred[i].cpu().detach().numpy()
+        true_matrix = tensor_true[i].cpu().detach().numpy()
 
         # Convert adjacency matrices to NetworkX graphs
         pred_graph = nx.from_numpy_array(pred_matrix, edge_attr="weight")

@@ -59,6 +59,22 @@ def generate_histogram(test_pred_tensor, target=None):
     # Show the plot
     plt.show()
 
+def generate_heatmap(single_tensor, save_path=None):
+    """
+    Produces heatmap of single tensor
+
+    input:
+    - sinlge_tensor: torch.tensor (single adjacency matrix)
+    - save_path: string (optional) (string with file name)
+    """
+    assert len(single_tensor.shape) == 2, 'tensor dimensionality is greater than 2 - only pass one matrix'
+    assert single_tensor.shape[0] == single_tensor.shape[1], 'tensor not square'
+    plt.imshow(single_tensor, cmap='hot', interpolation='nearest')
+    plt.colorbar()
+    if save_path:
+        plt.savefig(save_path)
+    plt.show()
+
 
 def new_generate_submission_file(prediction_tensors, filepath): 
     """

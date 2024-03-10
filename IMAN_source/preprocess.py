@@ -41,6 +41,7 @@ def convert_vector_to_graph_RH(data):
         pos_edge_index = torch.tensor(pos_edge_index, dtype=torch.long)
 
         return Data(x=x, pos_edge_index=pos_edge_index, edge_attr=edge_attr)
+
 def convert_vector_to_graph_HHR(data):
     """
         convert subject vector to adjacency matrix then use it to create a graph
@@ -127,6 +128,7 @@ def cast_data_vector_RH(dataset):
         dataset_g.append(convert_vector_to_graph_RH(dataset[subj]))
 
     return dataset_g
+
 def cast_data_vector_HHR(dataset):
     """
         convert subject vectors to graph and append it in a list
@@ -172,6 +174,7 @@ def convert_generated_to_graph_268(data1):
         dataset.append(data)
 
     return dataset
+    
 def convert_generated_to_graph(data):
     """
         convert generated output from G to a graph

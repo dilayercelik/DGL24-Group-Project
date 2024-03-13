@@ -15,3 +15,6 @@ Models_KM/
 trace.json
 final_submission/dgl-icl/
 final_submission/old/
+final_submission/predictions_fold_1.csv
+final_submission/predictions_fold_2.csv
+final_submission/predictions_fold_3.csv
